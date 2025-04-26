@@ -1,0 +1,234 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDG2: Zero Hunger - Target 2.2</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="logo">
+                    <img src="sdg_logo.png" alt="SDG2 Logo" class="logo-img">
+                </div>
+                <h1>End Hunger, Achieve Food Security</h1>
+                <h2>Focus on Target 2.2: End all forms of malnutrition</h2>
+                <p class="subtitle">Join our mission to improve nutrition and promote sustainable agriculture worldwide</p>
+                <a href="#podcast" class="btn primary-btn">Listen to Our Podcast</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="podcast" class="podcast-section">
+        <div class="container">
+            <h2 class="section-title">Featured Podcast: Tackling Malnutrition</h2>
+            <p class="section-description">A deep dive into SDG2 Target 2.2 focusing on The Gambia and Peru</p>
+            
+            <div class="media-container">
+                <div class="video-container">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/mczS419kBSk?si=N6Kr5zUppmLz_ISX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+                
+                <div class="audio-player">
+                    <h3>Listen to Audio Only</h3>
+                    <div class="audio-center">
+                        <audio controls id="audioPlayer" class="audio-element">
+                            <source src="audio.mp3" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="highlights-section">
+        <div class="container">
+            <h2 class="section-title">Key Highlights</h2>
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <div class="highlight-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>The Gambia</h3>
+                    <p>27% of population faced food insecurity in 2022, with projections of 244,000 people facing acute food insecurity in 2025.</p>
+                </div>
+                <div class="highlight-card">
+                    <div class="highlight-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Peru</h3>
+                    <p>Despite economic growth, 29% poverty rate in 2024 with over 1 million households in Lima facing high food insecurity.</p>
+                </div>
+                <div class="highlight-card">
+                    <div class="highlight-icon">
+                        <i class="fas fa-apple-alt"></i>
+                    </div>
+                    <h3>Impact</h3>
+                    <p>School feeding programs show improved nutrition, mental well-being, and education outcomes in both countries.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stories-section">
+        <div class="container">
+            <h2 class="section-title">Related Stories</h2>
+            <div class="carousel-container">
+                <button id="prevBtn" class="carousel-btn prev-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <div class="carousel">
+                    <div class="carousel-item">
+                        <div class="story-card">
+                            <div class="story-image">
+                                <div class="bg-placeholder" style="background-color: #f0f0f0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <p>Image: 16:9 (400x225)</p>
+                                </div>
+                            </div>
+                            <div class="story-content">
+                                <h3>Community's the Hero: Iron Communities Project</h3>
+                                <p>How targeted efforts in Ventania led to a 3.6% drop in anemia rates in children under three.</p>
+                                <a href="#" class="read-more">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="story-card">
+                            <div class="story-image">
+                                <div class="bg-placeholder" style="background-color: #f0f0f0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <p>Image: 16:9 (400x225)</p>
+                                </div>
+                            </div>
+                            <div class="story-content">
+                                <h3>School Feeding Success in The Gambia</h3>
+                                <p>How nutritious meals are improving food security, mental well-being, and education outcomes.</p>
+                                <a href="#" class="read-more">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="story-card">
+                            <div class="story-image">
+                                <div class="bg-placeholder" style="background-color: #f0f0f0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <p>Image: 16:9 (400x225)</p>
+                                </div>
+                            </div>
+                            <div class="story-content">
+                                <h3>Rice Fortification in Peru</h3>
+                                <p>How fortifying a staple food is reaching nearly 4 million people and improving nutrition.</p>
+                                <a href="#" class="read-more">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item">
+                        <div class="story-card">
+                            <div class="story-image">
+                                <div class="bg-placeholder" style="background-color: #f0f0f0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <p>Image: 16:9 (400x225)</p>
+                                </div>
+                            </div>
+                            <div class="story-content">
+                                <h3>Fill the Nutrient Gap Analysis</h3>
+                                <p>Understanding which nutrients are missing from people's diets and why.</p>
+                                <a href="#" class="read-more">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="nextBtn" class="carousel-btn next-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="carousel-dots">
+                <span class="dot active" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+                <span class="dot" data-index="3"></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Join The Fight Against Hunger</h2>
+            <p>Together we can end malnutrition and build sustainable food systems</p>
+            <button id="shareCtaBtn" class="btn primary-btn share-cta-btn">
+                <i class="fas fa-share-alt"></i> Share This Cause
+            </button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="sdg_logo.png" alt="SDG2 Logo" class="logo-img">
+                </div>
+                <div class="footer-links">
+                    <img src="sdg_logo.png" alt="SDG2 Logo" class="logo-img">
+                </div>
+                <div class="footer-social">
+                    <img src="sdg_logo.png" alt="SDG2 Logo" class="logo-img">
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 SDG2 Zero Hunger Initiative. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
